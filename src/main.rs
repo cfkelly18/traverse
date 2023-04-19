@@ -1,6 +1,6 @@
-mod analysis; 
-mod utils;
+mod analysis;
 mod driver;
+mod utils;
 
 use std::env;
 use std::path::PathBuf;

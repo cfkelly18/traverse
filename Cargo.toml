@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-syn = {version = "2.0.13", features = ["full", "extra-traits", "parsing", "visit"]}
+syn = {version = "2.0.13", features = ["full", "extra-traits", "parsing", "visit", "visit-mut"]}
 walkdir = "2"
