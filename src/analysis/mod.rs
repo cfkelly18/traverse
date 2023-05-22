@@ -3,7 +3,8 @@ use std::env::args;
 use syn::punctuated::Punctuated;
 use syn::visit::{self, Visit};
 use syn::{parse_file, Arm, Expr, ExprCall, ExprPath, File, ItemFn, Meta, Pat, Receiver, Token};
-
+mod disallow_println;
+pub use disallow_println::DisallowPrintlnVisitor;
 // TODO: add Result struct
 
 struct FunctionVisitor;
@@ -164,4 +165,8 @@ impl Analyzer {
         println!("Call Graph: {:#?}", entry_points);
         visitor.visit_file(&ast);
     }
+    pub fn run_static_analysis(&mut self, ast: syn::File) {
+        let mut visitors = vec![DisallowPrintlnVisitor { issues: vec![] }];
+    }
+
 }
