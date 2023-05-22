@@ -2,7 +2,7 @@ use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
 use syn::{parse_file, Item, ItemFn};
 use walkdir::WalkDir;
-use crate::driver::AuditDir;
+use crate::driver::{AuditDir, DirType};
 
 pub fn is_package(path: &Path) -> bool {
     path.join("Cargo.toml").exists()
@@ -22,8 +22,21 @@ pub fn walk(p: &PathBuf) -> Vec<PathBuf> {
             dir_files.push(entry.path().to_path_buf())
         }
     }
+    dir_files.sort();
     dir_files
     
+}
+
+pub fn get_dir_type(s: String) -> DirType {
+    let dir_type: DirType;
+    if s.contains("/contracts/") {
+        dir_type = DirType::Contract
+    } else if s.contains("/packages/") {
+        dir_type = DirType::Package
+    } else {
+        dir_type = DirType::Other
+    }
+    dir_type
 }
 
 /// Takes a path to a directory and returns a vector of all the .rs files in that directory and
@@ -35,8 +48,8 @@ pub fn walk_dir(p: &PathBuf) -> Vec<AuditDir> {
     for entry in WalkDir::new(p) {
         let entry = entry.unwrap();
         if entry.path().is_dir() && !check_dir(entry.path()) && is_package(entry.path()) && !audit_dirs.iter().any(|p| p.cmp(entry.path().to_path_buf())){
-
-            let new_dir = AuditDir::new(entry.path().to_path_buf(), walk(&entry.path().to_path_buf()));
+            let dir_type: DirType = get_dir_type(entry.path().to_str().unwrap().to_string());
+            let new_dir = AuditDir::new(entry.path().to_path_buf(), walk(&entry.path().to_path_buf()), dir_type);
             audit_dirs.push(new_dir);
         } 
     }

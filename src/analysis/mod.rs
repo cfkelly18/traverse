@@ -59,46 +59,20 @@ impl<'ast> Visit<'ast> for EntryPointVisitor {
             }
         }
     }
-
+    // Currently just naively picks up on the path segment
     fn visit_arm(&mut self, arm: &Arm) {
         match &arm.pat {
             Pat::Struct(pat) => {
-                let message_name = pat.path.segments.last().unwrap().ident.to_string();
-
-                self.entrypoints
-                    .insert(pat.path.segments.last().unwrap().ident.to_string());
-                self.visit_expr(&arm.body)
+                if pat.path.segments.first().unwrap().ident.to_string() == "ExecuteMsg" {
+                    self.entrypoints
+                        .insert(pat.path.segments.last().unwrap().ident.to_string());
+                }
             }
-            Pat::TupleStruct(pat) => {
-                self.entrypoints
-                    .insert(pat.path.segments.last().unwrap().ident.to_string());
-                self.visit_expr(&arm.body)
-            }
+        
             _ => {}
         }
     }
-    // TODO: Not really working when other functions are found..
-    // simplified: will not catch all entrypoints for now
-    fn visit_expr(&mut self, node: &'ast Expr) {
-        if let Expr::Call(call) = node {
-            // add function call to list
-            if let Expr::Path(path) = &*call.func {
-                let ident = &path.path.segments.last().unwrap().ident;
-                if ident != "new"
-                    && ident != "default"
-                    && ident != "from"
-                    && ident != "from_str"
-                    && ident != "Ok"
-                {
-                    // self.entrypoints.insert(ident.to_string());
-                    print!("\nMatched an Entrypoint fn: {:?}", ident.to_string());
-                }
-            }
-        }
-
-        // continue with traversal
-        visit::visit_expr(self, node);
-    }
+    
 }
 struct CallGraphVisitor {
     entrypoints: HashSet<String>,
