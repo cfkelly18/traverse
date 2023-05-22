@@ -1,8 +1,8 @@
+use crate::driver::{AuditDir, DirType};
 use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
 use syn::{parse_file, Item, ItemFn};
 use walkdir::WalkDir;
-use crate::driver::{AuditDir, DirType};
 
 pub fn is_package(path: &Path) -> bool {
     path.join("Cargo.toml").exists()
@@ -15,16 +15,18 @@ pub fn check_dir(dir: &Path) -> bool {
 }
 
 pub fn walk(p: &PathBuf) -> Vec<PathBuf> {
-    let mut dir_files: Vec<PathBuf> = Vec::new(); 
+    let mut dir_files: Vec<PathBuf> = Vec::new();
     for entry in WalkDir::new(p) {
-        let entry = entry.unwrap(); 
-        if entry.path().extension().is_some() && entry.path().extension().unwrap() == "rs" && !check_dir(entry.path()) {
+        let entry = entry.unwrap();
+        if entry.path().extension().is_some()
+            && entry.path().extension().unwrap() == "rs"
+            && !check_dir(entry.path())
+        {
             dir_files.push(entry.path().to_path_buf())
         }
     }
     dir_files.sort();
     dir_files
-    
 }
 
 pub fn get_dir_type(s: String) -> DirType {
@@ -43,15 +45,23 @@ pub fn get_dir_type(s: String) -> DirType {
 /// all subdirectories of that directory.
 pub fn walk_dir(p: &PathBuf) -> Vec<AuditDir> {
     let mut scope_files: Vec<PathBuf> = vec![];
-    let mut audit_dirs: Vec<AuditDir> = Vec::new(); 
-    
+    let mut audit_dirs: Vec<AuditDir> = Vec::new();
+
     for entry in WalkDir::new(p) {
         let entry = entry.unwrap();
-        if entry.path().is_dir() && !check_dir(entry.path()) && is_package(entry.path()) && !audit_dirs.iter().any(|p| p.cmp(entry.path().to_path_buf())){
+        if entry.path().is_dir()
+            && !check_dir(entry.path())
+            && is_package(entry.path())
+            && !audit_dirs.iter().any(|p| p.cmp(entry.path().to_path_buf()))
+        {
             let dir_type: DirType = get_dir_type(entry.path().to_str().unwrap().to_string());
-            let new_dir = AuditDir::new(entry.path().to_path_buf(), walk(&entry.path().to_path_buf()), dir_type);
+            let new_dir = AuditDir::new(
+                entry.path().to_path_buf(),
+                walk(&entry.path().to_path_buf()),
+                dir_type,
+            );
             audit_dirs.push(new_dir);
-        } 
+        }
     }
     println!("{:#?}", audit_dirs);
     audit_dirs

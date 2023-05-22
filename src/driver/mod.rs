@@ -1,5 +1,5 @@
-use std::path::PathBuf;
 use std::collections::{HashMap, HashSet};
+use std::path::PathBuf;
 
 #[path = "../utils/mod.rs"]
 mod utils;
@@ -10,7 +10,7 @@ mod analysis;
 pub enum DirType {
     Package,
     Contract,
-    Other
+    Other,
 }
 // Represents a specific directory / package
 #[derive(Debug, PartialEq, Clone)]
@@ -18,8 +18,7 @@ pub struct AuditDir {
     dir: PathBuf,
     dir_files: Vec<PathBuf>,
     entrypoints: HashSet<String>,
-    dir_type: DirType
-    // ast: syn::File,
+    dir_type: DirType, // ast: syn::File,
 }
 impl AuditDir {
     pub fn new(dir: PathBuf, dir_files: Vec<PathBuf>, dir_type: DirType) -> AuditDir {
@@ -27,8 +26,7 @@ impl AuditDir {
             dir,
             dir_files,
             entrypoints: HashSet::new(),
-            dir_type
-            // ast: syn::File::default(),
+            dir_type, // ast: syn::File::default(),
         }
     }
     pub fn cmp(&self, other: PathBuf) -> bool {
@@ -38,16 +36,10 @@ impl AuditDir {
         self.entrypoints = entrypoints;
     }
     pub fn summarize(&self) {
-        
-        
-
         println!("Directory: {:#?}", self.dir);
         println!("Entrypoints: {:#?}", self.entrypoints);
     }
-    
 }
-
-
 
 struct Driver {
     scope: PathBuf,
@@ -68,9 +60,9 @@ impl Driver {
 
         for mut dir in self.auditDirs.clone() {
             println!("{:#?}", dir);
-        
+
             let merged_ast = utils::get_merged_ast(&dir.dir_files);
-            
+
             // IF analysis flag is passed
             let mut analyzer = analysis::Analyzer::new();
             dir.set_entrypoints(analyzer.get_entrypoints(merged_ast.clone()));

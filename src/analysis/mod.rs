@@ -68,11 +68,10 @@ impl<'ast> Visit<'ast> for EntryPointVisitor {
                         .insert(pat.path.segments.last().unwrap().ident.to_string());
                 }
             }
-        
+
             _ => {}
         }
     }
-    
 }
 struct CallGraphVisitor {
     entrypoints: HashSet<String>,
@@ -142,5 +141,4 @@ impl Analyzer {
     pub fn run_static_analysis(&mut self, ast: syn::File) {
         let mut visitors = vec![DisallowPrintlnVisitor { issues: vec![] }];
     }
-
 }
