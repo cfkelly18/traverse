@@ -44,8 +44,8 @@ impl fmt::Display for FileSummary {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "\t{} Audit LOC: ({}) - Total LOC: {}",
-            self.name, self.audit_lines, self.loc
+            "\t[{}]\t  | LOC: ({})  | SLOC: ({})",
+            self.name, self.loc, self.audit_lines
         )
     }
 }
@@ -77,12 +77,26 @@ impl AuditDir {
         self.entrypoints = entrypoints;
     }
     pub fn fmt(&self) {
-        println!(
-            "\n> {} [{}] - [{}]",
-            self.dir.to_string_lossy().into_owned(),
-            self.dir_type,
-            self.dir_loc
-        );
+        let output_str: String;
+        if !self.entrypoints.is_empty() {
+            output_str = format!(
+                "\n> {} [{}] | SLOC: [{}] | Entrypoints: [{}]",
+                self.dir.to_string_lossy(),
+                self.dir_type.clone(),
+                self.dir_loc,
+                self.entrypoints.len()
+            );
+        } else {
+            output_str = format!(
+                "\n> {} [{}] | SLOC: [{}]",
+                self.dir.to_string_lossy(),
+                self.dir_type.clone(),
+                self.dir_loc
+            );
+        }
+
+
+        println!("{}", output_str);
         for f in self.dir_files.clone() {
             println!("{}", f);
         }
@@ -146,7 +160,7 @@ impl Driver {
 
         for d in self.auditDirs.clone() {
             d.fmt();
-            total_lines += d.dir_loc;
+            total_lines += d.dir_audit_lines;
         }
         let lines_per_hour: f32 = 200.0;
         let hours_per_aw: f32 = 20.0;
@@ -154,7 +168,7 @@ impl Driver {
         let time_est: f32 = total_lines as f32 / lines_per_hour;
         let aw = time_est / hours_per_aw;
         print!(
-            "\nTotal Lines: {}\nTime Est: {} Hours / AW Est {} ",
+            "\nTotal Lines: {}\nTime Est: {} Hours / AW Est {}\n ",
             total_lines, time_est, aw
         )
     }
