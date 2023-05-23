@@ -78,7 +78,7 @@ impl AuditDir {
     }
     pub fn fmt(&self) {
         println!(
-            "> {} [{}] - [{}]",
+            "\n> {} [{}] - [{}]",
             self.dir.to_string_lossy().into_owned(),
             self.dir_type,
             self.dir_loc
@@ -169,4 +169,5 @@ mod test {
         driver.scope = PathBuf::from("/Users/cfkelly18/DEV/cosmwasm/cw-plus/");
         driver.run();
     }
+
 }
