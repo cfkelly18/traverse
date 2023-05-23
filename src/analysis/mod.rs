@@ -84,7 +84,7 @@ impl<'ast> Visit<'ast> for CallGraphVisitor {
         if self.entrypoints.contains(&node.sig.ident.to_string()) {
             // syn::visit::visit_block(&mut function_calls, &*node.block);
             // println!("Function calls: {:?}", function_calls.function_calls);
-            print!("Matched an Entrypoint fn: {:?}", node.sig.ident);
+            //print!("Matched an Entrypoint fn: {:?}", node.sig.ident);
         }
         // syn::visit::visit_block(&mut self.function_calls, &*node.block);
 
