@@ -1,9 +1,9 @@
 use crate::driver::{AuditDir, DirType, FileSummary};
 use std::fs::read_to_string;
+use std::io::{self, BufRead};
 use std::path::{Path, PathBuf};
 use syn::{parse_file, Item, ItemFn};
 use walkdir::WalkDir;
-use std::io::{self, BufRead};
 
 pub fn is_package(path: &Path) -> bool {
     path.join("Cargo.toml").exists()
@@ -23,10 +23,10 @@ pub fn walk(p: &PathBuf) -> Vec<FileSummary> {
             && entry.path().extension().unwrap() == "rs"
             && !check_dir(entry.path())
         {
-            dir_files.push(FileSummary::new( entry.path().to_path_buf()))
+            dir_files.push(FileSummary::new(entry.path().to_path_buf()))
         }
     }
-   
+
     dir_files
 }
 
@@ -45,7 +45,6 @@ pub fn get_dir_type(s: String) -> DirType {
 /// Takes a path to a directory and returns a vector of all the .rs files in that directory and
 /// all subdirectories of that directory.
 pub fn walk_dir(p: &PathBuf) -> Vec<AuditDir> {
-    
     let mut audit_dirs: Vec<AuditDir> = Vec::new();
 
     for entry in WalkDir::new(p) {
@@ -88,33 +87,27 @@ pub fn get_merged_ast(files: &Vec<PathBuf>) -> syn::File {
     merged
 }
 
-pub fn get_file_lines(f: PathBuf) -> (u32  , u32){
+pub fn get_file_lines(f: PathBuf) -> (u32, u32) {
     let file = std::fs::File::open(f).unwrap();
     let lines = io::BufReader::new(file).lines();
 
     let mut loc: u32 = 0;
     let mut audit_lines: u32 = 0;
 
-        for l in lines {
-            if let Ok(l) = l {
-                loc += 1;
+    for l in lines {
+        if let Ok(l) = l {
+            loc += 1;
 
-                if !l.trim().is_empty() && !l.trim().starts_with("//") {
-                    if !l.trim().starts_with("#[test]") {
-                        audit_lines += 1;
-                    } else {
-                        break; // TODO: need to update to use AST to find test
-                    }
-                   
+            if !l.trim().is_empty() && !l.trim().starts_with("//") {
+                if !l.trim().starts_with("#[test]") {
+                    audit_lines += 1;
+                } else {
+                    break; // TODO: need to update to use AST to find test
                 }
             }
-            
         }
+    }
     return (loc, audit_lines);
-
-    
-
-
 }
 
 mod tests {
