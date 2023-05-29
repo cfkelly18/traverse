@@ -9,7 +9,6 @@ pub fn is_package(path: &Path) -> bool {
     path.join("Cargo.toml").exists()
 }
 
-
 // Checks if the directory is in the ignored list
 // TODO: add a list of ignored paths
 pub fn check_dir(dir: &Path) -> bool {
@@ -48,7 +47,6 @@ pub fn is_top_level_dir(dir_type: DirType) -> bool {
         DirType::Contract => false,
         DirType::Other => true, // TODO: update
     }
-    
 }
 
 /// Takes a path to a directory and returns a vector of all the .rs files in that directory and
@@ -61,22 +59,18 @@ pub fn walk_dir(p: &PathBuf) -> Vec<AuditDir> {
         if entry.path().is_dir()
             && !check_dir(entry.path())
             && is_package(entry.path())
-            && !audit_dirs.iter().any(|p| p.cmp(entry.path().to_path_buf())
-            
-        )
+            && !audit_dirs.iter().any(|p| p.cmp(entry.path().to_path_buf()))
         {
             let dir_type: DirType = get_dir_type(entry.path().to_str().unwrap().to_string());
             let is_tld = is_top_level_dir(dir_type.clone());
             if !is_tld {
-                
-            
-            let new_dir = AuditDir::new(
-                entry.path().to_path_buf(),
-                walk(&entry.path().to_path_buf()),
-                dir_type,
-            );
-            audit_dirs.push(new_dir);
-        }
+                let new_dir = AuditDir::new(
+                    entry.path().to_path_buf(),
+                    walk(&entry.path().to_path_buf()),
+                    dir_type,
+                );
+                audit_dirs.push(new_dir);
+            }
         }
     }
     // println!("{:#?}", audit_dirs);

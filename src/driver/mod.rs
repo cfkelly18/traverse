@@ -95,7 +95,6 @@ impl AuditDir {
             );
         }
 
-
         println!("{}", output_str);
         for f in self.dir_files.clone() {
             println!("{}", f);
@@ -183,5 +182,4 @@ mod test {
         driver.scope = PathBuf::from("/Users/cfkelly18/DEV/cosmwasm/cw-plus/");
         driver.run();
     }
-
 }
