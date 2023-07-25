@@ -139,7 +139,6 @@ impl Driver {
         for dir in &mut self.auditDirs {
             let merged_ast = utils::get_merged_ast(&dir.get_paths());
 
-            // IF analysis flag is passed
             let mut analyzer = analysis::Analyzer::new();
             dir.set_entrypoints(analyzer.get_entrypoints(merged_ast.clone()));
 
