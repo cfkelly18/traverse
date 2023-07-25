@@ -16,20 +16,4 @@ Traverse can be used as a library or a CLI.
 
 As a library:
 
-```rust
-use traverse::{Analyzer, DisallowPrintlnVisitor};
 
-let mut analyzer = Analyzer::new();
-
-let file = parse_file("src/contract.rs");
-analyzer.analyze(file);
-
-let entry_points = analyzer.get_entrypoints(file);
-
-let mut visitor = DisallowPrintlnVisitor::new();
-visitor.visit_file(&file);
-
-if !visitor.issues.is_empty() {
-  // Found println!
-}
-```
