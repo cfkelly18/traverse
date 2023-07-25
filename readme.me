@@ -1,0 +1,34 @@
+# Traverse
+
+Traverse is a Rust tool to analyze CosmWasm code and extract useful information.
+
+## Features
+
+- Parses Rust code using the syn crate
+- Finds all functions in a crate
+- Identifies entry point functions like `execute` in CosmWasm contracts
+- Builds a call graph to show relationships between functions [in progress]
+- Runs custom static analysis checks [in progress]
+
+## Usage
+
+Traverse can be used as a library or a CLI. 
+
+As a library:
+
+```rust
+use traverse::{Analyzer, DisallowPrintlnVisitor};
+
+let mut analyzer = Analyzer::new();
+
+let file = parse_file("src/contract.rs");
+analyzer.analyze(file);
+
+let entry_points = analyzer.get_entrypoints(file);
+
+let mut visitor = DisallowPrintlnVisitor::new();
+visitor.visit_file(&file);
+
+if !visitor.issues.is_empty() {
+  // Found println!
+}

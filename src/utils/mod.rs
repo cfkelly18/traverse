@@ -12,7 +12,7 @@ pub fn is_package(path: &Path) -> bool {
 // Checks if the directory is in the ignored list
 // TODO: add a list of ignored paths
 pub fn check_dir(dir: &Path) -> bool {
-    dir.to_str().unwrap().contains("/target/")
+    dir.to_str().unwrap().contains("/target/") || dir.to_str().unwrap().contains("test")
 }
 
 pub fn walk(p: &PathBuf) -> Vec<FileSummary> {
@@ -107,7 +107,7 @@ pub fn get_file_lines(f: PathBuf) -> (u32, u32) {
     for l in lines {
         if let Ok(l) = l {
             loc += 1;
-
+            // starting out with a very basic check
             if !l.trim().is_empty() && !l.trim().starts_with("//") {
                 if !l.trim().starts_with("#[test]") {
                     audit_lines += 1;
