@@ -5,29 +5,91 @@ mod utils;
 use std::env;
 use std::path::PathBuf;
 
+struct ScopeSource {
+    url: Option<String>,
+    path: Option<PathBuf>,
+}
 
 fn main() {
+    let mut args = env::args();
 
-  let args: Vec<String> = env::args().collect();
+    // Skip first argument which is program name
+    args.next();
 
-  if args.len() < 2 {
-    println!("Error: no scope argument provided");
-    return;
-  }
+    let mut scope_source = ScopeSource {
+        url: None,
+        path: None,
+    };
 
-  let scope = &args[1];
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--scope" => {
+                scope_source.path = args.next().map(PathBuf::from);
+            }
+            "--url" => {
+                scope_source.url = args.next().and_then(|s| Some(s.to_string()));
+            }
+            _ => println!("Unknown argument {}", arg),
+        }
+    }
 
-  if !PathBuf::from(scope).is_dir() {
-    println!("Error: {} is not a valid directory", scope);
-    return;
-  }
+    if let Some(url) = &scope_source.url {
+        if utils::validate_github_url(&url) {
+            println!("Analyzing {}", url);
+            let tmp_path = utils::process_remote_repo(&url);
+            print!("tmp_path: {}", tmp_path.display());
+            let mut driver = driver::Driver::new(true);
+            driver.set_scope(tmp_path);
 
-  println!("Analyzing {}", scope);
-  
-  let mut driver = driver::Driver::new();
-  driver.set_scope(PathBuf::from(scope));
-  driver.run();
+            // Run analysis...
+            driver.run();
+        } else {
+            println!("Error: {} is not a valid GitHub URL", url);
+        }
+    } else if let Some(path) = scope_source.path {
+        if !path.is_dir() {
+            println!("Error: {} is not a valid directory", path.display());
+            return;
+        }
 
+        println!("Analyzing {}", path.display());
+
+        let mut driver = driver::Driver::new(false);
+        driver.set_scope(path);
+
+        // Run analysis...
+        driver.run();
+    } else {
+        println!("Error: --scope argument required");
+    }
+    // match scope_source {
+    //   if let Some(path) => {
+    //     if !path.is_dir() {
+    //       println!("Error: {} is not a valid directory", path.display());
+    //       return;
+    //     }
+
+    //     println!("Analyzing {}", path.display());
+
+    //     let mut driver = driver::Driver::new();
+    //     driver.set_scope(path);
+
+    //     // Run analysis...
+    //     driver.run();
+
+    //   },
+    //   Some(url) => {
+    //     if utils::validate_github_url(&url) {
+    //       println!("Analyzing {}", url);
+    //     } else {
+    //       println!("Error: {} is not a valid GitHub URL", url);
+    //     }
+
+    //   },
+
+    //   None => {
+    //     println!("Error: --scope argument required");
+    //   }
+    // }
 }
-// cargo run -- /Users/cfkelly18/DEV/cosmwasm/cw-plus/
-
+// cargo run -- --scope /Users/cfkelly18/DEV/cosmwasm/cw-plus/
