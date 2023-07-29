@@ -124,14 +124,16 @@ impl AuditDir {
 pub struct Driver {
     scope: PathBuf,
     auditDirs: Vec<AuditDir>,
+    cleanup: bool,
     //args
 }
 
 impl Driver {
-    pub fn new() -> Driver {
+    pub fn new(cleanup:bool) -> Driver {
         Driver {
             scope: PathBuf::new(),
             auditDirs: Vec::new(),
+            cleanup: cleanup,
         }
     }
 
@@ -151,7 +153,12 @@ impl Driver {
             //analyzer.get_call_graph(merged_ast)
         }
         self.summarize();
-        self.cleanup();
+
+        // Only cleanup for remote repos
+        if self.cleanup {
+            self.cleanup();
+        }
+        
     }
     pub fn set_scope(&mut self, scope: PathBuf) {
         self.scope = scope;
@@ -179,14 +186,24 @@ impl Driver {
         )
     }
 }
+// need to add actual unit tests later
 
 mod test {
     use super::*;
 
     #[test]
     fn test_driver() {
-        let mut driver = Driver::new();
+        let mut driver = Driver::new(false);
         driver.scope = PathBuf::from("/Users/cfkelly18/DEV/cosmwasm/cw-plus/");
         driver.run();
     }
+    #[test]
+    fn test_remote_repo() {
+        let url = String::from("https://github.com/CosmWasm/cw-plus.git");
+        let mut driver = Driver::new(true);
+        driver.set_scope(utils::process_remote_repo(&url));
+        driver.run();
+
+    }
+        
 }

@@ -124,19 +124,20 @@ pub fn get_file_lines(f: PathBuf) -> (u32, u32) {
 }
 
 pub fn validate_github_url(url: &String) -> bool {
-    url.starts_with("https://github.com/")
+    url.starts_with("https://github.com/") || url.starts_with("git@github.com:")
 }
 pub fn process_remote_repo(url: &String) -> PathBuf {
     let repo_name = url.split("/").last().unwrap();
 
-    let repo_path = PathBuf::from(format!("./tmp/{}", repo_name));
+    let repo_path = PathBuf::from(format!("/tmp/{}", repo_name));
 
     let repo = Repository::clone(url, repo_path.clone());
 
     if let Ok(repo) = repo {
         println!("Cloned {} to {:?}", url, repo.path());
     } else {
-        println!("Error cloning {}", url);
+       
+        panic!("Error cloning {}, -- {}", url, repo.err().unwrap());
     }
 
     repo_path

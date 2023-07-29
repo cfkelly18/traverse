@@ -38,7 +38,7 @@ fn main() {
             println!("Analyzing {}", url);
             let tmp_path = utils::process_remote_repo(&url);
             print!("tmp_path: {}", tmp_path.display());
-            let mut driver = driver::Driver::new();
+            let mut driver = driver::Driver::new(true);
             driver.set_scope(tmp_path);
 
             // Run analysis...
@@ -54,7 +54,7 @@ fn main() {
 
         println!("Analyzing {}", path.display());
 
-        let mut driver = driver::Driver::new();
+        let mut driver = driver::Driver::new(false);
         driver.set_scope(path);
 
         // Run analysis...
