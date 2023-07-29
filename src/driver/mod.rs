@@ -2,6 +2,8 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::{self, Debug};
 use std::path::PathBuf;
 
+use std::fs;
+
 #[path = "../utils/mod.rs"]
 mod utils;
 
@@ -149,9 +151,15 @@ impl Driver {
             //analyzer.get_call_graph(merged_ast)
         }
         self.summarize();
+        self.cleanup();
     }
     pub fn set_scope(&mut self, scope: PathBuf) {
         self.scope = scope;
+    }
+    // very very basic cleanup for now
+    fn cleanup(&mut self) {
+        fs::remove_dir_all(&self.scope).unwrap();
+        println!("REMOVING: {:#?}", self.scope);
     }
     fn summarize(&self) {
         let mut total_lines = 0;

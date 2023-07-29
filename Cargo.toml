@@ -9,3 +9,5 @@ edition = "2021"
 syn = {version = "2.0.13", features = ["full", "extra-traits", "parsing", "visit", "visit-mut"]}
 walkdir = "2"
 decimal = "2.1.0"
+gix = "0.50.1"
+git2 = "0.17.2"

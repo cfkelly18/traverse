@@ -1,4 +1,7 @@
 use crate::driver::{AuditDir, DirType, FileSummary};
+use git2::Repository;
+use gix::bstr::BStr;
+use std::ffi::OsStr;
 use std::fs::read_to_string;
 use std::io::{self, BufRead};
 use std::path::{Path, PathBuf};
@@ -120,6 +123,24 @@ pub fn get_file_lines(f: PathBuf) -> (u32, u32) {
     return (loc, audit_lines);
 }
 
+pub fn validate_github_url(url: &String) -> bool {
+    url.starts_with("https://github.com/")
+}
+pub fn process_remote_repo(url: &String) -> PathBuf {
+    let repo_name = url.split("/").last().unwrap();
+
+    let repo_path = PathBuf::from(format!("./tmp/{}", repo_name));
+
+    let repo = Repository::clone(url, repo_path.clone());
+
+    if let Ok(repo) = repo {
+        println!("Cloned {} to {:?}", url, repo.path());
+    } else {
+        println!("Error cloning {}", url);
+    }
+
+    repo_path
+}
 mod tests {
     use super::*;
     use std::path::PathBuf;
