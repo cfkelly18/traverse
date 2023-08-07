@@ -140,5 +140,12 @@ impl Analyzer {
     }
     pub fn run_static_analysis(&mut self, ast: syn::File) {
         let mut visitors = vec![DisallowPrintlnVisitor { issues: vec![] }];
+
+        for visitor in visitors.iter_mut() {
+            visitor.visit_file(&ast);
+            for issue in visitor.issues.iter() {
+                println!("{}", issue);
+            }
+        }
     }
 }

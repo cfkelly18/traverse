@@ -125,15 +125,17 @@ pub struct Driver {
     scope: PathBuf,
     auditDirs: Vec<AuditDir>,
     cleanup: bool,
+    analysis: bool,
     //args
 }
 
 impl Driver {
-    pub fn new(cleanup:bool) -> Driver {
+    pub fn new(cleanup:bool, analysis:bool) -> Driver {
         Driver {
             scope: PathBuf::new(),
             auditDirs: Vec::new(),
             cleanup: cleanup,
+            analysis: analysis,
         }
     }
 
@@ -149,8 +151,11 @@ impl Driver {
             dir.set_file_lines(); // TODO - If in scoping mode
 
             // I removed analysis function for now.. just a scoper until I get time to work on it
-            // analyzer.analyze(merged_ast);
-            //analyzer.get_call_graph(merged_ast)
+            if self.analysis {
+                analyzer.run_static_analysis(merged_ast)
+                //analyzer.get_call_graph(merged_ast);
+            }
+            // 
         }
         self.summarize();
 
@@ -193,14 +198,14 @@ mod test {
 
     #[test]
     fn test_driver() {
-        let mut driver = Driver::new(false);
+        let mut driver = Driver::new(false, false);
         driver.scope = PathBuf::from("/Users/cfkelly18/DEV/cosmwasm/cw-plus/");
         driver.run();
     }
     #[test]
     fn test_remote_repo() {
         let url = String::from("https://github.com/CosmWasm/cw-plus.git");
-        let mut driver = Driver::new(true);
+        let mut driver = Driver::new(true, false);
         driver.set_scope(utils::process_remote_repo(&url));
         driver.run();
 
