@@ -130,7 +130,7 @@ pub struct Driver {
 }
 
 impl Driver {
-    pub fn new(cleanup:bool, analysis:bool) -> Driver {
+    pub fn new(cleanup: bool, analysis: bool) -> Driver {
         Driver {
             scope: PathBuf::new(),
             auditDirs: Vec::new(),
@@ -141,6 +141,11 @@ impl Driver {
 
     pub fn run(&mut self) {
         self.auditDirs = utils::walk_dir(&self.scope);
+
+        if self.auditDirs.is_empty() {
+            println!("No files found in {}", self.scope.display());
+            return;
+        }
 
         for dir in &mut self.auditDirs {
             let merged_ast = utils::get_merged_ast(&dir.get_paths());
@@ -155,7 +160,7 @@ impl Driver {
                 analyzer.run_static_analysis(merged_ast)
                 //analyzer.get_call_graph(merged_ast);
             }
-            // 
+            //
         }
         self.summarize();
 
@@ -163,7 +168,6 @@ impl Driver {
         if self.cleanup {
             self.cleanup();
         }
-        
     }
     pub fn set_scope(&mut self, scope: PathBuf) {
         self.scope = scope;
@@ -208,7 +212,5 @@ mod test {
         let mut driver = Driver::new(true, false);
         driver.set_scope(utils::process_remote_repo(&url));
         driver.run();
-
     }
-        
 }

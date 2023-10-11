@@ -12,6 +12,5 @@ impl<'ast> Visit<'ast> for DisallowPrintlnVisitor {
 
         // Traverse the rest of the function's AST.
         syn::visit::visit_item_fn(self, item_fn);
-
     }
 }

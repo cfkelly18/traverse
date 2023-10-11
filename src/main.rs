@@ -67,6 +67,5 @@ fn main() {
     } else {
         println!("Error: --scope argument required");
     }
-   
 }
 // cargo run -- --scope /Users/cfkelly18/DEV/cosmwasm/cw-plus/
