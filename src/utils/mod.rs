@@ -136,7 +136,6 @@ pub fn process_remote_repo(url: &String) -> PathBuf {
     if let Ok(repo) = repo {
         println!("Cloned {} to {:?}", url, repo.path());
     } else {
-       
         panic!("Error cloning {}, -- {}", url, repo.err().unwrap());
     }
 

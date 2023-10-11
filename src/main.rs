@@ -20,6 +20,7 @@ fn main() {
         url: None,
         path: None,
     };
+    let mut analysis = false;
 
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -28,6 +29,10 @@ fn main() {
             }
             "--url" => {
                 scope_source.url = args.next().and_then(|s| Some(s.to_string()));
+            }
+            "--analysis" => {
+                analysis = true;
+                println!("Analysis mode enabled");
             }
             _ => println!("Unknown argument {}", arg),
         }
@@ -38,7 +43,7 @@ fn main() {
             println!("Analyzing {}", url);
             let tmp_path = utils::process_remote_repo(&url);
             print!("tmp_path: {}", tmp_path.display());
-            let mut driver = driver::Driver::new(true);
+            let mut driver = driver::Driver::new(true, analysis);
             driver.set_scope(tmp_path);
 
             // Run analysis...
@@ -54,7 +59,7 @@ fn main() {
 
         println!("Analyzing {}", path.display());
 
-        let mut driver = driver::Driver::new(false);
+        let mut driver = driver::Driver::new(false, analysis);
         driver.set_scope(path);
 
         // Run analysis...
@@ -62,34 +67,5 @@ fn main() {
     } else {
         println!("Error: --scope argument required");
     }
-    // match scope_source {
-    //   if let Some(path) => {
-    //     if !path.is_dir() {
-    //       println!("Error: {} is not a valid directory", path.display());
-    //       return;
-    //     }
-
-    //     println!("Analyzing {}", path.display());
-
-    //     let mut driver = driver::Driver::new();
-    //     driver.set_scope(path);
-
-    //     // Run analysis...
-    //     driver.run();
-
-    //   },
-    //   Some(url) => {
-    //     if utils::validate_github_url(&url) {
-    //       println!("Analyzing {}", url);
-    //     } else {
-    //       println!("Error: {} is not a valid GitHub URL", url);
-    //     }
-
-    //   },
-
-    //   None => {
-    //     println!("Error: --scope argument required");
-    //   }
-    // }
 }
 // cargo run -- --scope /Users/cfkelly18/DEV/cosmwasm/cw-plus/
