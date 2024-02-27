@@ -67,11 +67,12 @@ pub fn walk_dir(p: &PathBuf) -> Vec<AuditDir> {
             let dir_type: DirType = get_dir_type(entry.path().to_str().unwrap().to_string());
             let is_tld = is_top_level_dir(dir_type.clone());
             if !is_tld {
-                let new_dir = AuditDir::new(
+                let mut new_dir = AuditDir::new(
                     entry.path().to_path_buf(),
                     walk(&entry.path().to_path_buf()),
                     dir_type,
                 );
+                //new_dir.order_files();
                 audit_dirs.push(new_dir);
             }
         }

@@ -119,6 +119,10 @@ impl AuditDir {
             self.dir_audit_lines += audit_lines;
         }
     }
+    pub fn order_files(&mut self) {
+        self.dir_files
+            .sort_by(|a, b| a.audit_lines.cmp(&b.audit_lines));
+    }
 }
 
 pub struct Driver {
@@ -179,7 +183,6 @@ impl Driver {
     }
     fn summarize(&self) {
         let mut total_lines = 0;
-
         for d in self.auditDirs.clone() {
             d.fmt();
             total_lines += d.dir_audit_lines;
@@ -199,16 +202,16 @@ impl Driver {
 
 mod test {
     use super::*;
-
-    #[test]
-    fn test_driver() {
-        let mut driver = Driver::new(false, false);
-        driver.scope = PathBuf::from("/Users/cfkelly18/DEV/cosmwasm/cw-plus/");
-        driver.run();
-    }
+    // for testing locally
+    // #[test]
+    // fn test_driver() {
+    //     let mut driver = Driver::new(false, false);
+    //     driver.scope = PathBuf::from("/Users/ck_admin/Developer/audits/savanna-contracts");
+    //     driver.run();
+    // }
     #[test]
     fn test_remote_repo() {
-        let url = String::from("https://github.com/CosmWasm/cw-plus.git");
+        let url = String::from("https://github.com/CosmWasm/cw-plus");
         let mut driver = Driver::new(true, false);
         driver.set_scope(utils::process_remote_repo(&url));
         driver.run();
